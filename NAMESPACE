@@ -1,0 +1,5 @@
+exportPattern("^[[:alpha:]]+")
+ importFrom("stats", "rbinom")
+ importFrom("expint", "expint_Ei")
+ importFrom("ggplot2", "ggplot", "aes")
+ importFrom("reshape2", "melt")
