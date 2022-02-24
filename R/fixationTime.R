@@ -1,7 +1,6 @@
 ## Copyright (c) 2022 Vincent Runge
 
 
-
 #' Fixation Time Simulation in Wright-Fisher Model with selection
 #'
 #' @description Simulation of the Wright-Fisher problem with selection coefficient and given initial population in alleles a and A
@@ -93,6 +92,71 @@ fixation_time0 <- function(N, alpha, p)
   return(coeff * (-D*exp(alpha*(1-p)) + C + res2 + exp(alpha)*res3)/u)
 }
 
+
+
+
+################################################################################
+
+
+#' Fixation Time in Wright-Fisher Model with selection by Taylor expansion
+#'
+#' @description This function computes the time to fixation for a given initial probability and fixed selection coefficient alpha using a Taylor expansion
+#' @param N Number of alleles in the considered population (population size)
+#' @param alpha Selection coefficient
+#' @param p Vector or initial probabilities (values between 0 and 1)
+#' @param k number of elements in the Taylor expansion
+#' @param type Type of approximation to use (1 or 2)
+#' @return the time to fixation using an approximation by Taylor expansion
+fixation_time_approx <- function(N, alpha, p, k = 100, type = "2")
+{
+  ###intern function omega_approx1
+  omega_approx1 <- function(alpha, p, k = k)
+  {
+    int_log_u_e_u <- function(x, k)  ## integral of log(u) exp u from 0 to x
+    {
+      res <- 0
+      for(i in (k+1):1){res <- (res + log(abs(x)) -  1/i)*(x/i)}
+      return(res)
+    }
+
+
+    res1 <- (1- exp(-alpha*p))/(1- exp(-alpha)) * exp(-alpha)* int_log_u_e_u(alpha, k)
+    res2 <- (exp(-alpha*p)) * sapply(alpha*p, function(x) int_log_u_e_u(x, k))
+    return((res1 - res2)/alpha)
+  }
+
+  ###intern function omega_approx2
+  omega_approx2 <- function(alpha, p, k = k)
+  {
+    temp <- 0
+    for(i in k:1){temp <- (temp - log(abs(alpha)) + sum(1/(1:i)))*(-alpha)/i}
+    res1 <- (1- exp(-alpha*p))/(1- exp(-alpha)) * temp
+
+    temp <- 0
+    for(i in k:1){temp <- (temp - log(abs(alpha*p)) + sum(1/(1:i)))*(-alpha*p)/i}
+    res2 <- temp
+    return((res1 - res2)/alpha)
+  }
+
+  if(type == "1"){res <- 2 * N * (omega_approx1(alpha, p, k) + omega_approx1(-alpha, 1-p, k))}
+  else{res <- 2 * N * (omega_approx2(alpha, p, k) + omega_approx2(-alpha, 1-p, k))}
+  return(res)
+}
+
+
+
+
+#' Value of the upper bound majoration
+#'
+#' @description Upper bound majoring the L1 norm between exact and approximate result for fixation time
+#' @param alpha Selection coefficient
+#' @param k number of elements in the Taylor expansion
+#' @return upper bound value
+upper_bound_value <- function(alpha, k)
+{
+  res <- (exp(alpha)*alpha^k/factorial(k)) * ((2*log(alpha) + exp(-1))/(k+1) + 3)
+  return(res)
+}
 
 
 

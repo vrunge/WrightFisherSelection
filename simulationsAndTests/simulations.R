@@ -35,8 +35,8 @@ ALLSIMUS01 <- function(N, alpha, step, NbSimus)
 
 #######
 ##simu
-N <- 10000
-alpha <- 50
+N <- 100
+alpha <- 70
 step <- N/100
 res <- ALLSIMUS01(N = N, alpha = alpha, step = step, NbSimus = 100)
 

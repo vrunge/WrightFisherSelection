@@ -7,7 +7,8 @@
 plotFixationTimeSelection(
   N = 100,
   alphas = c(0, 3, 7, 15, 30),
-  p = seq(0.01, 1 - 0.01, by = 0.01)
+  p = seq(0.01, 1 - 0.01, by = 0.01),
+  type = "both"
 )
 }
 \arguments{
@@ -16,9 +17,11 @@ plotFixationTimeSelection(
 \item{alphas}{Vector of selection coefficients}
 
 \item{p}{Vector or initial probabilities (values between 0 and 1)}
+
+\item{type}{Fixation type: both (fixation to zero and one) or one}
 }
 \value{
-the time to fixation
+Plot of the time to fixation curve
 }
 \description{
 This function plots the fixation time curves for a given probability vector and different selection coefficients
