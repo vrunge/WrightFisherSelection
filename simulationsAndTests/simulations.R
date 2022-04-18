@@ -6,16 +6,25 @@
 #- All fixation times are saved in file.path(WD,"data/FILE".rds") ------------##
 #- ---------------------------------------------------------------------------##
 
-library(WrightFisherSelection)
+source("simulations_utils.R")
 library(parallel)
 
+#- set working directory and number of logical cores to use during simu ------##
 WD <- "/guillem/aliehrmann/Documents/WrightFisherSelection-paper"
 NB_LOGICAL_CORES <- 70
 
 ##- range of parameters to test ----------------------------------------------##
-N                <- c(100, 1000, 5000, 10000, 15000, 20000)
+N                <- c(100,200,300,400,500,600,700,800,900,1000)
 p                <- seq(0.05,0.95, by=0.05)
 alpha            <- seq(1,30,length=20)
+
+#- zoom on alpha in [1,3] ----------------------------------------------------##
+#p      <- seq(0.05,0.95, by=0.05)
+#alpha  <- seq(1,3,length=20)
+#params <- expand.grid(N, alpha, p)
+#N      <- 100
+#-----------------------------------------------------------------------------##
+
 params           <- expand.grid(N, alpha, p)
 colnames(params) <- c("N", "alpha", "p")
 target_nb_rep    <- 1e4
@@ -33,7 +42,7 @@ params <- estimate_running_time(
 )
 sort(params$running_time)
 
-#- keep only sim that should takes less than 6 hours -------------------------##
+#- keep only sim that should take less than 6 hours --------------------------##
 params <- params[params$running_time/60<6,]
 
 #- fixation time using simu --------------------------------------------------##
@@ -54,7 +63,7 @@ res_simu_fixations  <- do.call(rbind, mclapply(
 ))
 saveRDS(
   res_simu_fixations, 
-  file.path(WD, "/data/res_simu_fixations.rds")
+  file.path(WD, "/data/res_simu_fixations4.rds")
 )
 
 #- fixation time using analytic solutions ------------------------------------##
@@ -77,12 +86,14 @@ res_analytic_solutions  <- do.call(rbind, mclapply(
 ))
 saveRDS(
   res_analytic_solutions, 
-  file.path(WD, "/data/res_analytic_solutions.rds")
+  file.path(WD, "/data/res_analytic_solutions4.rds")
 )
 
 #- fixation time using approximations ----------------------------------------##
+
 type              <- 1
-k                 <- seq(1, 50, 2)
+k                 <- 1:300
+N = 100
 params2           <- expand.grid(N, alpha, p, k, type)
 colnames(params2) <- c("N", "alpha", "p", "k", "type")
 
@@ -109,7 +120,7 @@ res_approximation <- do.call(rbind, mclapply(
 ))  
 saveRDS(
   res_approximation, 
-  file.path(WD, "/data/res_approximation.rds")
+  file.path(WD, "/data/res_approximation4.rds")
 )
 
 
