@@ -5,6 +5,7 @@
 #- (3) estimate running time for each simulation (see estimate_running_time) -##
 #-----------------------------------------------------------------------------##
 
+library(WrightFisherSelection)
 
 #- simu_feasability ----------------------------------------------------------##
 # params        : grid of parameters
@@ -97,13 +98,19 @@ simu_fixations <- function(
   var_time_fix0 <- NA
   var_time_fix1 <- NA
   all_time_fix  <- unlist(res_simu[1,])
-  all_type_fix  <- unlist(res_simu[2,])+1
+  all_type_fix  <- unlist(res_simu[2,])
   #- 2 stands for fixation to 1 ----------------------------------------------##
   #- 1 stands for fixation to 0 ----------------------------------------------##
   
   #- mean and variance of fixation time to 1 ---------------------------------##
   if (search_fix1){
-    all_time_fix1    <- all_time_fix[all_type_fix==2]
+    #- all_type_fix == 1 returns FALSE ---------------------------------------##
+    #- answer & solution : ---------------------------------------------------##
+    #- https://stackoverflow.com/questions/9508518/why-are-these-numbers-not-equal
+    all_time_fix1    <- all_time_fix[sapply(
+      all_type_fix, 
+      function(x) isTRUE(all.equal(x, 1)))
+    ]
     sample_time_fix1 <- sample(
       x     = all_time_fix1, 
       size  = min(length(all_time_fix1), target_nb_rep)
@@ -114,7 +121,10 @@ simu_fixations <- function(
   
   #- mean and variance of fixation time to 0 ---------------------------------##
   if (search_fix0){
-    all_time_fix0     <- all_time_fix[all_type_fix==1]
+    all_time_fix0     <- all_time_fix[sapply(
+      all_type_fix, 
+      function(x) isTRUE(all.equal(x, 0)))
+    ]
     sample_time_fix0  <- sample(
       x     = all_time_fix0, 
       size  = min(length(all_time_fix0), target_nb_rep)
